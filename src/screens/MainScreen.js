@@ -8,7 +8,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -45,7 +45,7 @@ const MainScreen = () => {
     //   .catch(err => console.error(err));
 
     axios
-      .get('https://jsonplaceholder.typicode.com/todos?_limit=5', {
+      .get('https://jsonplaceholder.typicode.com/todos?_limit=1', {
         timeout: 5000,
       })
       .then(res => {
@@ -106,11 +106,11 @@ const MainScreen = () => {
     // }
 
     function getTodoConcurrent() {
-      return axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5');
+      return axios.get('https://jsonplaceholder.typicode.com/todos?_limit=2');
     }
 
     function getPostConcurrent() {
-      return axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5');
+      return axios.get('https://jsonplaceholder.typicode.com/posts?_limit=2');
     }
 
     Promise.all([getTodoConcurrent(), getPostConcurrent()]).then(function (
@@ -239,7 +239,7 @@ const MainScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.backgroundStyle}>
-      {netInfo ? null : <Text style={{ color: 'red' }}> NO CONNECTION </Text>}
+      {netInfo ? null : <Text style={{color: 'red'}}> NO CONNECTION </Text>}
       <View style={styles.controller}>
         <TouchableOpacity style={styles.getButton} onPress={getTodos}>
           <Text>GET</Text>

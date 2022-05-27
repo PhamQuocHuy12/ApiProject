@@ -44,6 +44,11 @@ const MainScreen = () => {
     //   .then(res => (res))
     //   .catch(err => console.error(err));
 
+    //     const controller = new AbortController()
+    // const timeoutId = setTimeout(() => controller.abort(), 5000)
+    // fetch(url, { signal: controller.signal }).then(response => {
+    // })
+
     axios
       .get('https://jsonplaceholder.typicode.com/todos?_limit=1', {
         timeout: 5000,
@@ -73,8 +78,10 @@ const MainScreen = () => {
   function updateTodo() {
     axios
       .patch('https://jsonplaceholder.typicode.com/todos/1', {
-        title: 'Updated Todo',
-        completed: true,
+        data: {
+          title: 'Updated Todo',
+          completed: true,
+        },
       })
       .then(res => {
         console.log(res);

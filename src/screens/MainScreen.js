@@ -52,6 +52,10 @@ const MainScreen = () => {
     axios
       .get('https://jsonplaceholder.typicode.com/todos?_limit=1', {
         timeout: 5000,
+        // `maxContentLength` defines the max size of the http response content in bytes allowed in node.js
+        maxContentLength: 2000,
+        // `maxBodyLength` (Node only option) defines the max size of the http request content in bytes allowed
+        maxBodyLength: 2000,
       })
       .then(res => {
         console.log(res);

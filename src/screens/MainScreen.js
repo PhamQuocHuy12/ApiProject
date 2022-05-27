@@ -8,7 +8,7 @@
  * @format
  */
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -23,7 +23,7 @@ const MainScreen = () => {
     alignItems: 'center',
   };
   const [netInfo, setNetInfo] = useState();
-  const unsubscribe = NetInfo.addEventListener(state => {
+  NetInfo.addEventListener(state => {
     console.log('Connection type', state.type);
     console.log('Is connected?', state.isConnected);
     if (state.isConnected !== netInfo) {
@@ -150,26 +150,31 @@ const MainScreen = () => {
   function errorHandling() {
     axios
       .get('https://jsonplaceholder.typicode.com/todoss', {
-        // validateStatus: function(status) {
-        //   return status < 500; // Reject only if status is greater or equal to 500
-        // }
+        validateStatus: function (status) {
+          return status < 500; // Reject only if status is greater or equal to 500
+        },
       })
       .then(res => console.log(res))
       .catch(err => {
-        if (err.response) {
-          // Server responded with a status other than 200 range
-          console.log(err.response.data);
-          console.log(err.response.status);
-          console.log(err.response.headers);
-
-          if (err.response.status === 404) {
-            alert('Error: Page Not Found');
-          }
-        } else if (err.request) {
-          // Request was made but no response
-          console.error(err.request);
+        if (err.code === 'ERR_NETWORK') {
+          alert('NO CONNECTION');
+          return;
         } else {
-          console.error(err.message);
+          if (err.response) {
+            // Server responded with a status other than 200 range
+            console.log(err.response.data);
+            console.log(err.response.status);
+            console.log(err.response.headers);
+
+            if (err.response.status === 404) {
+              alert('Error: Page Not Found');
+            }
+          } else if (err.request) {
+            // Request was made but no response
+            console.error(err.request);
+          } else {
+            console.error(err.message);
+          }
         }
       });
   }

@@ -8,8 +8,14 @@
  * @format
  */
 
-import React, {useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, { useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 
 const axios = require('axios').default;
@@ -18,11 +24,8 @@ axios.defaults.headers.common['X-Auth-Token'] =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
 const MainScreen = () => {
-  const backgroundStyle = {
-    padding: 10,
-    alignItems: 'center',
-  };
   const [netInfo, setNetInfo] = useState();
+  const [response, setResponse] = useState({});
   NetInfo.addEventListener(state => {
     console.log('Connection type', state.type);
     console.log('Is connected?', state.isConnected);
@@ -45,7 +48,10 @@ const MainScreen = () => {
       .get('https://jsonplaceholder.typicode.com/todos?_limit=5', {
         timeout: 5000,
       })
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        setResponse(res);
+      })
       .catch(err => console.error(err));
   }
 
@@ -56,7 +62,10 @@ const MainScreen = () => {
         title: 'New Todo',
         completed: false,
       })
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        setResponse(res);
+      })
       .catch(err => console.error(err));
   }
 
@@ -67,7 +76,10 @@ const MainScreen = () => {
         title: 'Updated Todo',
         completed: true,
       })
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        setResponse(res);
+      })
       .catch(err => console.error(err));
   }
 
@@ -75,7 +87,10 @@ const MainScreen = () => {
   function removeTodo() {
     axios
       .delete('https://jsonplaceholder.typicode.com/todos/1')
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        setResponse(res);
+      })
       .catch(err => console.error(err));
   }
 
@@ -104,6 +119,7 @@ const MainScreen = () => {
       const todo = results[0];
       const post = results[1];
       console.log(todo, post);
+      setResponse(results);
     });
   }
 
@@ -125,7 +141,10 @@ const MainScreen = () => {
         },
         config,
       )
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        setResponse(res);
+      })
       .catch(err => console.error(err));
   }
 
@@ -143,7 +162,10 @@ const MainScreen = () => {
       }),
     };
 
-    axios(options).then(res => console.log(res));
+    axios(options).then(res => {
+      console.log(res);
+      setResponse(res);
+    });
   }
 
   // ERROR HANDLING
@@ -154,7 +176,10 @@ const MainScreen = () => {
           return status < 500; // Reject only if status is greater or equal to 500
         },
       })
-      .then(res => console.log(res))
+      .then(res => {
+        console.log(res);
+        setResponse(res);
+      })
       .catch(err => {
         if (err.code === 'ERR_NETWORK') {
           alert('NO CONNECTION');
@@ -204,38 +229,69 @@ const MainScreen = () => {
     baseURL: 'https://jsonplaceholder.typicode.com',
   });
 
+  const toText = text => {
+    if (text !== undefined) {
+      return JSON.stringify(text);
+    } else {
+      return '';
+    }
+  };
+
   return (
-    <View style={backgroundStyle}>
-      {netInfo ? null : <Text style={{color: 'red'}}> NO CONNECTION </Text>}
-      <TouchableOpacity style={styles.getButton} onPress={getTodos}>
-        <Text>GET</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={addTodo}>
-        <Text>POST</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={updateTodo}>
-        <Text>PUT</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={removeTodo}>
-        <Text>DELETE</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={getData}>
-        <Text>GET 2</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={customHeaders}>
-        <Text>CUSTOME HEADER</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={transformResponse}>
-        <Text>TRANSFORMING</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.getButton} onPress={errorHandling}>
-        <Text>HANDLING ERROR</Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView contentContainerStyle={styles.backgroundStyle}>
+      {netInfo ? null : <Text style={{ color: 'red' }}> NO CONNECTION </Text>}
+      <View style={styles.controller}>
+        <TouchableOpacity style={styles.getButton} onPress={getTodos}>
+          <Text>GET</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={addTodo}>
+          <Text>POST</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={updateTodo}>
+          <Text>PUT</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={removeTodo}>
+          <Text>DELETE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={getData}>
+          <Text>GET 2</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={customHeaders}>
+          <Text>CUSTOME HEADER</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={transformResponse}>
+          <Text>TRANSFORMING</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.getButton} onPress={errorHandling}>
+          <Text>HANDLING ERROR</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.text}>{`Data: ${toText(response.data)}`}</Text>
+      <Text style={styles.text}>{`Status: ${toText(response.status)}`}</Text>
+      <Text style={styles.text}>{`Headers: ${toText(response.headers)}`}</Text>
+      <Text style={styles.text}>{`Code: ${toText(response.code)}`}</Text>
+      <Text style={styles.text}>{`Message: ${toText(response.message)}`}</Text>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundStyle: {
+    padding: 10,
+    alignItems: 'center',
+    flex: 1,
+  },
+  controller: {
+    flex: 1,
+    alignContent: 'center',
+    justifyContent: 'space-around',
+    flexDirection: 'column',
+    width: '100%',
+    flexWrap: 'wrap',
+    maxHeight: 200,
+    backgroundColor: 'gray',
+    borderRadius: 15,
+  },
   getButton: {
     backgroundColor: 'lightblue',
     width: '40%',
@@ -244,6 +300,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 10,
     marginVertical: 10,
+    marginHorizontal: 15,
+  },
+  text: {
+    color: 'black',
   },
 });
 

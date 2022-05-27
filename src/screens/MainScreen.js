@@ -119,7 +119,7 @@ const MainScreen = () => {
       const todo = results[0];
       const post = results[1];
       console.log(todo, post);
-      setResponse(results);
+      // setResponse({...results, data: results.data});
     });
   }
 

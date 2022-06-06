@@ -2,13 +2,14 @@
  * @format
  */
 
-import {AppRegistry, Platform} from 'react-native';
+import {AppRegistry, Platform, Alert} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from 'react-native-push-notification';
 import DeviceInfo from 'react-native-device-info';
 import messaging from '@react-native-firebase/messaging';
+import NavigationService from './src/navigation/NavigatorService';
 
 if (!DeviceInfo.isEmulator() || Platform.OS === 'android') {
   PushNotification.getChannels(function (channel_ids) {
@@ -38,30 +39,11 @@ PushNotification.configure({
     if (!notification) {
       return;
     }
-    if (notification.badge) {
-      const badgeNumber = notification.badge;
-      PushNotificationIOS.setApplicationIconBadgeNumber(badgeNumber);
-      if (
-        Platform.OS === 'ios' &&
-        notification &&
-        notification.finish &&
-        typeof notification.finish === 'function'
-      ) {
-        if (
-          notification &&
-          PushNotificationIOS &&
-          PushNotificationIOS.FetchResult &&
-          PushNotificationIOS.FetchResult.NoData
-        ) {
-          notification.finish(PushNotificationIOS.FetchResult.NoData);
-        }
-      }
+    if (notification?.userInteraction) {
+      handleTapNotification(notification).then(res => {
+        console.log('res', res);
+      });
     }
-    // if (notification?.userInteraction) {
-    //   handleTapNotification(notification).then(res => {
-    //     console.log(res);
-    //   });
-    // }
   },
   onAction: function (notification) {
     console.log('ACTION:', notification.action);
@@ -79,23 +61,42 @@ PushNotification.configure({
   requestPermissions: true,
 });
 
+const handleTapNotification = async notification => {
+  console.log(2, notification);
+  await handlePushNotification(notification);
+};
+
+const handlePushNotification = notification => {
+  console.log('HANDLE PUSH NOTIFICATION = ', notification);
+  handleNavigateScreen(notification.message);
+};
+
+const handleNavigateScreen = message => {
+  console.log(message);
+  if (message.includes('huy')) {
+    setTimeout(() => {
+      console.log(NavigationService.getRef());
+      NavigationService.getRef().current.navigate('Noti');
+    }, 300);
+  }
+};
+
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
-  PushNotification.localNotification({
-    channelId: 'default-channel-id',
-    // message: `Message handled in the background!, ${remoteMessage}`,
-    message: 'ToNoti',
-  });
+  if (Platform.OS === 'android') {
+    PushNotification.localNotification({
+      channelId: 'default-channel-id',
+      vibrate: false,
+      id: 0,
+      title: remoteMessage?.notification?.title,
+      message: remoteMessage?.notification?.body ?? '',
+    });
+  }
 });
 
-messaging().onMessage(async remoteMessage => {
-  // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-  console.log(remoteMessage);
-  PushNotification.localNotification({
-    channelId: 'default-channel-id',
-    message: `Foreground, ${remoteMessage}`,
-    // message: 'A new FCM message arrived!',
-  });
+messaging().onNotificationOpenedApp(remoteMessaging => {
+  console.log('Notification Click Open App = ', remoteMessaging);
+  handleNavigateScreen(remoteMessaging?.notification?.body ?? '');
 });
 
 AppRegistry.registerComponent(appName, () => App);

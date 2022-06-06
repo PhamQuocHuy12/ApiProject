@@ -8,45 +8,35 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from 'react-native-push-notification';
 
 const MainScreen = () => {
-  async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-    }
-  }
-
   const pushNotiNow = () => {
     PushNotification.localNotification({
       channelId: 'default-channel-id',
-      message: 'My Notification Message',
+      vibrate: false,
+      id: 0,
+      title: 'clicked',
+      message: 'huy 123',
     });
   };
 
   const pushDelay = () => {
     console.log(3);
     PushNotification.localNotificationSchedule({
-      title: 'hehehe',
-      channelId: 'default-channel-id',
-      message: 'After 3s',
-      date: new Date(Date.now() + 3 * 1000),
+      title: 'Have your dreams come true ?',
+      date: new Date(new Date().getTime() + 4 * 1000),
+      message: 'hehehehehe',
       allowWhileIdle: false,
+      channelId: 'default-channel-id',
     });
   };
 
